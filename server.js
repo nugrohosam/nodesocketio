@@ -28,7 +28,8 @@ io.on("connect", client => {
     }
 
     function emitClientFunction(name, func, params) {
-        client.emit(name, JSON.stringify({ func, params }))
+        const callbackFunction = JSON.stringify({ func, params })
+        client.emit(name, callbackFunction)
     }
 
     for (let i = 0; i < listWeb.length; i++) {
@@ -40,7 +41,8 @@ io.on("connect", client => {
             const token = getToken(message)
 
             if (data.type == TYPE_FUNCTION) {
-                emitClientFunction(data.name, { func: data.func, params: data.params })
+                dataFunc = { func: data.func, params: data.params }
+                emitClientFunction(data.name, dataFunc)
             } else if (data.type == TYPE_MESSAGE) {
                 emitClientMessage(data.name, data.message)
             } else {

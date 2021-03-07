@@ -14,22 +14,22 @@
 <script>
     // Create SocketIO instance, connect
 
-    var socket = new io.connect("http://localhost:3000")
+    var socket = new io.connect(`http://localhost:3000`)
 
-    const hostname = window.location.hostname || "localhost"
-    // Add a connect listener
-    socket.on("connection-with-localhost", function () {
-        console.log("Client has connected to the server!");
+    const hostname = window.location.hostname || `localhost`
+    socket.on(`connection-with-localhost`, () => {
+        console.log(`Client has connected to the server!`);
     });
 
-    const listeningFunctionSocket = "connection-with-localhost-function"
-    socket.on(listeningFunctionSocket, function ({ func, params }) {
-        const data = {func}.call(...params)
-        console.log(data)
+    const listeningFunctionSocket = `connection-with-${hostname}-function`
+    socket.on(listeningFunctionSocket, (message) => {
+        const { func, params } = JSON.parse(message)
+        // const data = {func}.call(...params)
+        console.log(func, params)
     });
 
-    const listeningMessageSocket = "connection-with-localhost"
-    socket.on(listeningMessageSocket, function (message) {
+    const listeningMessageSocket = `connection-with-${hostname}`
+    socket.on(listeningMessageSocket, (message) => {
         console.log(message)
     });
 
@@ -38,28 +38,28 @@
     }
 
     function sendDisconnect(message) {
-        // Add a disconnect listener
-        socket.on("disconnect", function () {
-            console.log("The client has disconnected!");
+        socket.on(`disconnect`, () => {
+            console.log(`The client has disconnected!`);
         });
     };
 
-    socket.emit("connection-with-localhost", JSON.stringify({
-        token: "1", data: {
-            type: "TYPE_FUNCTION",
+    const connectWithHostname = `connection-with-${hostname}`
+    socket.emit(connectWithHostname, JSON.stringify({
+        token: `1`, data: {
+            type: `TYPE_FUNCTION`,
             name: listeningFunctionSocket,
-            func: "updateData",
+            func: `updateData`,
             params: [
-                12, "rojak"
+                12, `rojak`
             ]
         }
     }));
 
-    socket.emit("connection-with-localhost", JSON.stringify({
-        token: "1", data: {
-            type: "TYPE_MESSAGE",
+    socket.emit(connectWithHostname, JSON.stringify({
+        token: `1`, data: {
+            type: `TYPE_MESSAGE`,
             name: listeningMessageSocket,
-            message: "anjing kau"
+            message: `anjing kau`
         }
     }));
 </script>
