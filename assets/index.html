@@ -14,7 +14,7 @@
 <script>
     // Create SocketIO instance, connect
 
-    var socket = new io.connect(`http://localhost:3000`)
+    var socket = new io.connect()
 
     const hostname = window.location.hostname || `localhost`
     socket.on(`connection-with-localhost`, () => {
@@ -23,9 +23,8 @@
 
     const listeningFunctionSocket = `connection-with-${hostname}-function`
     socket.on(listeningFunctionSocket, (message) => {
-        const { func, params } = JSON.parse(message)
-        // const data = {func}.call(...params)
-        console.log(func, params)
+        const data = JSON.parse(message)
+        window[data.func](data.params);
     });
 
     const listeningMessageSocket = `connection-with-${hostname}`

@@ -19,7 +19,6 @@ const server = http.createServer(
     })
 
 const io = require("socket.io")(server)
-const port = process.env.PORT || 3000
 
 io.on("connect", client => {
 
@@ -27,11 +26,11 @@ io.on("connect", client => {
         client.emit(name, message)
     }
 
-    function emitClientFunction(name, func, params) {
-        const callbackFunction = JSON.stringify({ func, params })
+    function emitClientFunction(name, dataFunc) {
+        const callbackFunction = JSON.stringify(dataFunc)
         client.emit(name, callbackFunction)
     }
-
+    
     for (let i = 0; i < listWeb.length; i++) {
         let dataConn = prefixConn + listWeb[i]
         client.on(dataConn, message => {
@@ -55,6 +54,8 @@ io.on("connect", client => {
         console.log(data + " --> disconnected")
     })
 })
+
+const port = process.env.PORT || Math.floor(Math.random() * 50000)
 server.listen(port)
 
 console.log("listening in port :", port)
