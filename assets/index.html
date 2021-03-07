@@ -22,6 +22,21 @@
         console.log("Client has connected to the server!");
     });
 
+    const listeningFunctionSocket = "connection-with-localhost-function"
+    socket.on(listeningFunctionSocket, function ({ func, params }) {
+        const data = {func}.call(...params)
+        console.log(data)
+    });
+
+    const listeningMessageSocket = "connection-with-localhost"
+    socket.on(listeningMessageSocket, function (message) {
+        console.log(message)
+    });
+
+    function updateData(...args) {
+        return args
+    }
+
     function sendDisconnect(message) {
         // Add a disconnect listener
         socket.on("disconnect", function () {
@@ -29,7 +44,24 @@
         });
     };
 
-    socket.emit("connection-with-localhost", "anjing bangsat babi emang kau");
+    socket.emit("connection-with-localhost", JSON.stringify({
+        token: "1", data: {
+            type: "TYPE_FUNCTION",
+            name: listeningFunctionSocket,
+            func: "updateData",
+            params: [
+                12, "rojak"
+            ]
+        }
+    }));
+
+    socket.emit("connection-with-localhost", JSON.stringify({
+        token: "1", data: {
+            type: "TYPE_MESSAGE",
+            name: listeningMessageSocket,
+            message: "anjing kau"
+        }
+    }));
 </script>
 
 <body>
