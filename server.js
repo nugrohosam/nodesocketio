@@ -87,7 +87,7 @@ io.on("connect", client => {
 
         client.on(clientConn, message => {
             const data = getData(message)
-            const type = data?.type || null
+            const type = data.type || null
 
             if (type == TYPE_FUNCTION) {
                 dataFunc = { func: data.func, params: data.params }
@@ -100,7 +100,7 @@ io.on("connect", client => {
         client.on(privateRoom, message => {
             const data = getData(message)
             const roomId = getRoomId(message)
-            const type = data?.type || null
+            const type = data.type || null
 
             if (type == TYPE_FUNCTION) {
                 dataFunc = { func: data.func, params: data.params }
