@@ -1,9 +1,11 @@
+require('dotenv').config()
 
 const TYPE_FUNCTION = "TYPE_FUNCTION"
 const TYPE_MESSAGE = "TYPE_MESSAGE"
 const PRIVATE_ROOM = "-private-room"
 const DISCONNECT = "-disconnect"
 const JOIN_ROOM = "-join-room"
+
 
 const listWebString = process.env.CONNECTION_WEB || "localhost"
 const listWeb = listWebString.split(",")
