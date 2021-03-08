@@ -13,6 +13,8 @@ const port = process.env.PORT || Math.floor(Math.random() * 50000)
 
 const path = require('path')
 const http = require("http")
+const url = require('url');
+
 const { readFileSync } = require("fs")
 const { getData, getToken, getRoomId } = require("./event/event-data")
 const { generateId } = require("./utilities/helpers")
@@ -26,6 +28,17 @@ const filePathIndex = path.format({
 const htmlLocalhost = readFileSync(filePathIndex, { encoding: "utf-8" })
 const server = http.createServer(
     function (req, res) {
+        const params = url.parse(req.url, true).query;
+        const room = params.room || null
+        if (!room) {
+            const locationRedirect = process.env.HOST + ":" + port + "?room=" + generateId(20)
+            res.writeHead(302, {
+                'Location': locationRedirect
+            });
+            res.end()
+            return
+        }
+
         res.writeHead(200, { "Content-Type": "text/html" })
         res.write(htmlLocalhost)
         res.end()
