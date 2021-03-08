@@ -31,8 +31,9 @@
     <button onclick="makeMessage()">Submit chat</button>
 
     <script>
-        var socket = new io.connect("localhost:3000")
         const hostname = window.location.hostname || `localhost`
+        const completeHostname = hostname + ":" + window.location.port
+        var socket = new io.connect(completeHostname)
 
         // identifier of connected client session in current page
         function genreateToken(length) {
