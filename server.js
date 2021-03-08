@@ -33,13 +33,6 @@ const server = http.createServer(
 const io = sio(server)
 
 io.on("connect", client => {
-
-    function emitClientMessage(clientCall, name, message, roomId) {
-    }
-
-    function emitClientFunction(clientCall, name, dataFunc, roomId) {
-    }
-
     for (let i = 0; i < listWeb.length; i++) {
         let clientConn = prefixConn + listWeb[i]
         let joinRoom = clientConn + JOIN_ROOM
@@ -51,9 +44,12 @@ io.on("connect", client => {
             if (!roomId) {
                 roomId = generateId(10)
             }
+
             client.join(roomId)
-            emitClientMessage(joinRoom, roomId, token)
+            io.to(roomId).emit(privateRoom, "token : " + token + " join in " + roomId)
+
             client.on("disconnect", _ => {
+                console.log("disconnect from server", token)
                 io.to(roomId).emit(disconnectRoom, JSON.stringify({ token }))
             })
         })

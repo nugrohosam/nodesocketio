@@ -31,9 +31,20 @@
     <button onclick="makeMessage()">Submit chat</button>
 
     <script>
-        var socket = new io.connect()
+        var socket = new io.connect("localhost:3000")
         const hostname = window.location.hostname || `localhost`
-        const token = Math.random(Math.floor() * 5000)
+
+        // identifier of connected client session in current page
+        function genreateToken(length) {
+            var result = '';
+            var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            var charactersLength = characters.length;
+            for (var i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+            return result;
+        }
+        const token = genreateToken(10)
 
         // contract event
         const roomConn = `connection-with-${hostname}`
@@ -52,12 +63,28 @@
         const room = urlParams.get("room");
         const changeRoomTo = room || null
 
+        socket.on(joinRoom, message => {
+            conditionalEvent(message)
+        })
+
+        socket.on(disconnectRoom, message => {
+            conditionalEvent(message)
+        })
+
+        socket.on(privateRoomConn, message => {
+            conditionalEvent(message)
+        })
+
+        socket.on(messagePrivateRoom, message => {
+            conditionalEvent(message)
+        })
+
         if (!room) {
             socket.emit(joinRoom, JSON.stringify({ token }))
         } else {
             myRoom = room
             document.getElementById("join-room-private")?.remove()
-            socket.emit(joinRoom, JSON.stringify({ room_id: room }))
+            socket.emit(joinRoom, JSON.stringify({ room_id: room, token: token }))
         }
 
         function isJson(str) {
@@ -73,23 +100,15 @@
             if (isJson(message)) {
                 const data = JSON.parse(message)
                 const func = data?.func || null
-                window[func](data.params)
+                if (func) {
+                    window[func](data.params)
+                } else {
+                    console.log(message)
+                }
             } else {
                 console.log(message)
             }
         }
-
-        socket.on(joinRoom, message => {
-            conditionalEvent(message)
-        })
-
-        socket.on(disconnectRoom, message => {
-            conditionalEvent(message)
-        })
-
-        socket.on(messagePrivateRoom, message => {
-            conditionalEvent(message)
-        })
 
         function getMessage(message) {
             console.log("called get message")
