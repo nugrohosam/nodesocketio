@@ -12,7 +12,7 @@ const listWeb = listWebString.split(",")
 const prefixConn = process.env.CONNECTION_PREFIX || "connection-with-"
 const port = process.env.PORT || Math.floor(Math.random() * 50000)
 
-const path = require('path');
+const path = require('path')
 const http = require("http")
 const { readFileSync } = require("fs")
 const { getData, getToken, getRoomId } = require("./event/event-data")
@@ -24,7 +24,7 @@ const delimiter = path.delimiter;
 const filePathIndex = path.format({
     dir: __dirname + "/assets",
     base: 'index.html'
-});
+})
 const htmlLocalhost = readFileSync(filePathIndex, { encoding: "utf-8" })
 const server = http.createServer(
     function (req, res) {
