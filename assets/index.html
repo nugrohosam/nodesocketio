@@ -16,9 +16,16 @@
     <a href="/?room=private" id="join-room-private"> Join In Room Private </a>
 
     <p>chat : </p>
-    <div name="chatroom" id="chatroom">
+    <div name="chatroom" id="chatroom" style="
+        height: 500px;
+        width: 98%;
+        overflow:scroll;
+        background: rgb(212, 196, 196);
+        display: inline-block;
+    ">
 
     </div>
+
     <br>
     <input id="message" type="text">
     <button onclick="makeMessage()">Submit chat</button>
@@ -32,13 +39,13 @@
         const privateRoomConn = `connection-with-${hostname}-private-room`
         const messagePrivateRoom = "message-private-room"
         let myRoom = null
-        
+
         const urlParams = new URLSearchParams(window.location.search);
         const room = urlParams.get("room");
         const changeRoomTo = room || null
-        
+
         socket.emit(initialConn, JSON.stringify({ token }))
-        
+
         if (!room) {
             socket.emit(roomConn, JSON.stringify({ token }))
             socket.on(roomConn, (message) => {
@@ -54,7 +61,7 @@
         socket.on(initialConn, message => {
             const data = JSON.parse(message)
             const func = data?.func || null
-            
+
             if (func) {
                 window[func](data.params)
             } else {
@@ -76,6 +83,7 @@
         function getMessage(message) {
             console.log("called")
             const pElem = document.createElement('p')
+            pElem.setAttribute("style", "padding-left: 0.3em")
             pElem.append(message)
             document.getElementById("chatroom").appendChild(pElem)
         }
