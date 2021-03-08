@@ -10,6 +10,7 @@ const listWebString = process.env.CONNECTION_WEB || "localhost"
 const listWeb = listWebString.split(",")
 const prefixConn = process.env.CONNECTION_PREFIX || "connection-with-"
 const port = process.env.PORT || Math.floor(Math.random() * 50000)
+const portHost = process.env.PORT_HOST || 80
 
 const path = require('path')
 const http = require("http")
@@ -31,7 +32,7 @@ const server = http.createServer(
         const params = url.parse(req.url, true).query;
         const room = params.room || null
         if (!room) {
-            const locationRedirect = process.env.HOST + ":" + port + "?room=" + generateId(20)
+            const locationRedirect = process.env.HOST + ":" + portHost + "?room=" + generateId(20)
             res.writeHead(302, {
                 'Location': locationRedirect
             });
