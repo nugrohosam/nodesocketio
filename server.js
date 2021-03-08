@@ -8,18 +8,21 @@ const JOIN_ROOM = "-join-room"
 const listWebString = process.env.CONNECTION_WEB || "localhost"
 const listWeb = listWebString.split(",")
 const prefixConn = process.env.CONNECTION_PREFIX || "connection-with-"
-const filePathIndex = __dirname + "\\assets\\index.html";
 const port = process.env.PORT || Math.floor(Math.random() * 50000)
 
+const path = require('path');
 const http = require("http")
 const { readFileSync } = require("fs")
 const { getData, getToken, getRoomId } = require("./event/event-data")
 const { generateId } = require("./utilities/helpers")
 const { setKeyRoom } = require("./utilities/room")
 const sio = require("socket.io")
-const redis = require("redis");
 
-const redisClient = redis.createClient();
+const delimiter = path.delimiter;
+const filePathIndex = path.format({
+    dir: __dirname + "/assets",
+    base: 'index.html'
+});
 const htmlLocalhost = readFileSync(filePathIndex, { encoding: "utf-8" })
 const server = http.createServer(
     function (req, res) {
@@ -113,7 +116,7 @@ io.on("connect", client => {
         client.on(disconnect, message => {
             const roomId = getRoomId(message)
             const token = getToken(message)
-            
+
             leaveRoom(privateRoom, roomId, token)
         })
     }
