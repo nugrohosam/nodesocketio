@@ -34,54 +34,65 @@
         var socket = new io.connect()
         const hostname = window.location.hostname || `localhost`
         const token = Math.random(Math.floor() * 5000)
-        const initialConn = `connection-with-${hostname}`
-        const roomConn = `connection-with-${hostname}-join-room`
-        const privateRoomConn = `connection-with-${hostname}-private-room`
+
+        // contract event
+        const roomConn = `connection-with-${hostname}`
+
+        // default data event require join room
+        const joinRoom = `${roomConn}-join-room`
+        const privateRoomConn = `${roomConn}-private-room`
+        const disconnectRoom = `${roomConn}-disconnect`
+
+        // custom data event that you want to listen
         const messagePrivateRoom = "message-private-room"
+
         let myRoom = null
 
         const urlParams = new URLSearchParams(window.location.search);
         const room = urlParams.get("room");
         const changeRoomTo = room || null
 
-        socket.emit(initialConn, JSON.stringify({ token }))
-
         if (!room) {
-            socket.emit(roomConn, JSON.stringify({ token }))
-            socket.on(roomConn, (message) => {
-                const data = JSON.parse(message)
-                myRoom = data.room_id
-            })
+            socket.emit(joinRoom, JSON.stringify({ token }))
         } else {
-            document.getElementById("join-room-private")?.remove()
             myRoom = room
-            socket.emit(roomConn, JSON.stringify({ room_id: room }))
+            document.getElementById("join-room-private")?.remove()
+            socket.emit(joinRoom, JSON.stringify({ room_id: room }))
         }
 
-        socket.on(initialConn, message => {
-            const data = JSON.parse(message)
-            const func = data?.func || null
+        function isJson(str) {
+            try {
+                JSON.parse(str);
+            } catch (e) {
+                return false;
+            }
+            return true;
+        }
 
-            if (func) {
+        function conditionalEvent(message) {
+            if (isJson(message)) {
+                const data = JSON.parse(message)
+                const func = data?.func || null
                 window[func](data.params)
             } else {
-                console.log(data)
+                console.log(message)
             }
+        }
+
+        socket.on(joinRoom, message => {
+            conditionalEvent(message)
+        })
+
+        socket.on(disconnectRoom, message => {
+            conditionalEvent(message)
         })
 
         socket.on(messagePrivateRoom, message => {
-            const data = JSON.parse(message)
-            const func = data?.func || null
-
-            if (func) {
-                window[func](...data.params)
-            } else {
-                console.log(data)
-            }
+            conditionalEvent(message)
         })
 
         function getMessage(message) {
-            console.log("called")
+            console.log("called get message")
             const pElem = document.createElement('p')
             pElem.setAttribute("style", "padding-left: 0.3em")
             pElem.append(message)
