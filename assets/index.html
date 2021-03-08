@@ -11,59 +11,96 @@
         crossorigin="anonymous"></script>
 </head>
 
-<script>
-    // Create SocketIO instance, connect
-
-    var socket = new io.connect()
-
-    const hostname = window.location.hostname || `localhost`
-    socket.on(`connection-with-localhost`, () => {
-        console.log(`Client has connected to the server!`);
-    });
-
-    const listeningFunctionSocket = `connection-with-${hostname}-function`
-    socket.on(listeningFunctionSocket, (message) => {
-        const data = JSON.parse(message)
-        window[data.func](data.params);
-    });
-
-    const listeningMessageSocket = `connection-with-${hostname}`
-    socket.on(listeningMessageSocket, (message) => {
-        console.log(message)
-    });
-
-    function updateData(...args) {
-        return args
-    }
-
-    function sendDisconnect(message) {
-        socket.on(`disconnect`, () => {
-            console.log(`The client has disconnected!`);
-        });
-    };
-
-    const connectWithHostname = `connection-with-${hostname}`
-    socket.emit(connectWithHostname, JSON.stringify({
-        token: `1`, data: {
-            type: `TYPE_FUNCTION`,
-            name: listeningFunctionSocket,
-            func: `updateData`,
-            params: [
-                12, `rojak`
-            ]
-        }
-    }));
-
-    socket.emit(connectWithHostname, JSON.stringify({
-        token: `1`, data: {
-            type: `TYPE_MESSAGE`,
-            name: listeningMessageSocket,
-            message: `anjing kau`
-        }
-    }));
-</script>
 
 <body>
+    <a href="/?room=private" id="join-room-private"> Join In Room Private </a>
+
+    <p>chat : </p>
+    <div name="chatroom" id="chatroom">
+
+    </div>
+    <br>
+    <input id="message" type="text">
+    <button onclick="makeMessage()">Submit chat</button>
+
+    <script>
+        var socket = new io.connect()
+        const hostname = window.location.hostname || `localhost`
+        const token = Math.random(Math.floor() * 5000)
+        const initialConn = `connection-with-${hostname}`
+        const roomConn = `connection-with-${hostname}-join-room`
+        const privateRoomConn = `connection-with-${hostname}-private-room`
+        const messagePrivateRoom = "message-private-room"
+        let myRoom = null
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const room = urlParams.get("room");
+        const changeRoomTo = room || null
+        
+        socket.emit(initialConn, JSON.stringify({ token }))
+        
+        if (!room) {
+            socket.emit(roomConn, JSON.stringify({ token }))
+            socket.on(roomConn, (message) => {
+                const data = JSON.parse(message)
+                myRoom = data.room_id
+            })
+        } else {
+            document.getElementById("join-room-private")?.remove()
+            myRoom = room
+            socket.emit(roomConn, JSON.stringify({ room_id: room }))
+        }
+
+        socket.on(initialConn, message => {
+            const data = JSON.parse(message)
+            const func = data?.func || null
+            
+            if (func) {
+                window[func](data.params)
+            } else {
+                console.log(data)
+            }
+        })
+
+        socket.on(messagePrivateRoom, message => {
+            const data = JSON.parse(message)
+            const func = data?.func || null
+
+            if (func) {
+                window[func](...data.params)
+            } else {
+                console.log(data)
+            }
+        })
+
+        function getMessage(message) {
+            console.log("called")
+            const pElem = document.createElement('p')
+            pElem.append(message)
+            document.getElementById("chatroom").appendChild(pElem)
+        }
+
+        function makeMessage() {
+            const message = document.getElementById("message").value
+            const callFunc = {
+                name: messagePrivateRoom,
+                type: "TYPE_FUNCTION",
+                func: "getMessage",
+                params: [
+                    message
+                ]
+            }
+
+            const data = {
+                token: token,
+                room_id: myRoom,
+                data: callFunc
+            }
+
+            socket.emit(privateRoomConn, JSON.stringify(data))
+        }
+
+    </script>
 </body>
 
 </html>
