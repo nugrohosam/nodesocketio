@@ -10,7 +10,7 @@ const listWebString = process.env.CONNECTION_WEB || "localhost"
 const listWeb = listWebString.split(",")
 const prefixConn = process.env.CONNECTION_PREFIX || "connection-with-"
 const port = process.env.PORT || Math.floor(Math.random() * 50000)
-const portHost = process.env.PORT_HOST || 80
+const portHost = process.env.PORT_HOST || port
 
 const path = require('path')
 const http = require("http")
