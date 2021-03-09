@@ -44,7 +44,11 @@ const server = http.createServer(
         res.write(htmlLocalhost)
         res.end()
     })
-const io = sio(server)
+const io = sio(server, {
+    cors: {
+        origin: '*',
+    }
+})
 
 io.on("connect", client => {
     for (let i = 0; i < listWeb.length; i++) {
