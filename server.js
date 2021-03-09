@@ -50,37 +50,45 @@ const io = sio(server, {
     }
 })
 
-console.log("list web allowed to connect : ", listWeb)
+console.log("list web allowed to connect :", listWeb)
 
 io.on("connect", client => {
+    console.log("client connect :", client.id)
     for (let i = 0; i < listWeb.length; i++) {
         let clientConn = prefixConn + listWeb[i]
         let joinRoom = clientConn + JOIN_ROOM
         let privateRoom = clientConn + PRIVATE_ROOM
         let disconnectRoom = clientConn + DISCONNECT
+
+        console.log("listening to connection of :", joinRoom, privateRoom, disconnectRoom)
         client.on(joinRoom, message => {
+            console.log("called from client :", joinRoom, "with message :", message)
             const token = getToken(message)
             let roomId = getRoomId(message)
             if (!roomId) {
                 roomId = generateId(10)
             }
-
+            
+            console.log("join :", roomId)
             client.join(roomId)
             io.to(roomId).emit(privateRoom, "token : " + token + " join in " + roomId)
-
+            
             client.on("disconnect", _ => {
                 console.log("disconnect from server", token)
                 io.to(roomId).emit(disconnectRoom, JSON.stringify({ token }))
             })
         })
         client.on(privateRoom, message => {
+            console.log("called from client :", privateRoom, "with message :", message)
             const data = getData(message)
             const roomId = getRoomId(message)
             if (data && (data.type || null)) {
                 if (data.type == TYPE_FUNCTION) {
+                    console.log("broadcast to client :", roomId)
                     io.to(roomId).emit(data.name, JSON.stringify({ func: data.func, params: data.params }))
                 } else if (data.type == TYPE_MESSAGE) {
-                    io.to(roomId).emit(data.name, JSON.stringify(data))
+                    console.log("broadcast to client :", data.message)
+                    io.to(roomId).emit(data.name, JSON.stringify(data.message))
                 }
             }
         })
