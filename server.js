@@ -50,6 +50,8 @@ const io = sio(server, {
     }
 })
 
+console.log("list web allowed to connect : ", listWeb)
+
 io.on("connect", client => {
     for (let i = 0; i < listWeb.length; i++) {
         let clientConn = prefixConn + listWeb[i]
