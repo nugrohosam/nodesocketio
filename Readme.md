@@ -7,4 +7,4 @@
 ## How to use
 - this socket.io server you can connect and define call method in another file just put in message of socket.emit()
 - type of message can use is 2 type (TYPE_FUNCTION, TYPE_MESSAGE)
-- see Example in : assets/index.html
+- see example in : assets/index.html
